@@ -1,0 +1,202 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package ULL;
+
+/**
+ *
+ * @author Lukas
+ * @param <E>
+ */
+public class KTUULL<Integer> implements ULL<Integer> {
+    
+    protected class ULLNode    
+    {
+        ULLNode next;
+        int size;
+        int array[];
+
+        /* Constructor */
+        public ULLNode(int n)
+        {
+            next = null;        // reference to next node in list
+            size = 0;           // number of elements in this node, up to maxElements
+            array = new int[n]; /* an array of numElements elements, 
+                                    with space allocated for maxElements elements */
+        }
+    }
+    
+    private ULLNode start;
+    private ULLNode end;
+    private int sizeNode;
+    private int nNode;
+    
+    public KTUULL(int capacity)
+    {
+        start = null;
+        end = null;
+        nNode = 0;
+        sizeNode = capacity + 1;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        
+        return start == null;
+        
+    }
+    
+    @Override
+    public void clear() {
+        
+        start = null;
+        end = null;
+        nNode = 0;
+        
+    }
+
+    @Override
+    public boolean contains(int x) {
+        
+        ULLNode beginNode = start;
+        
+        while (beginNode != null) {
+            for (int i = 0; i < beginNode.size; i++)
+                if (beginNode.array[i] == x) {
+                    return true;
+                }
+           
+            beginNode = beginNode.next;
+        }
+        
+        return false;
+    }
+
+    @Override
+    public int size() {
+        
+        return nNode;
+        
+    }
+
+    @Override
+    public boolean add(int x) {
+       
+        nNode++;
+        
+        if (start == null) {
+            
+            start = new ULLNode(sizeNode);
+            start.array[0] = x;
+            start.size++;
+            end = start;
+            
+        } else if (end.size + 1 < sizeNode) {
+            
+            end.array[end.size] = x;
+            end.size++;
+            
+        } else {
+            
+            ULLNode nptr = new ULLNode(sizeNode);
+            int j = 0;
+            
+            for (int i = end.size / 2 + 1; i < end.size; i++)
+                nptr.array[j++] = end.array[i];
+            
+            nptr.array[j++] = x;
+            nptr.size = j;
+            end.size = end.size / 2 + 1;
+            end.next = nptr;
+            end = nptr;
+            
+        }
+        
+        return true;
+    }
+
+    @Override
+    public boolean remove(int x) {
+        
+        ULLNode beginNode = start;
+            
+        while (beginNode != null) {
+            for (int i = 0; i < beginNode.size; i++)
+                if (beginNode.array[i] == x) {
+                    removeFromNode(beginNode, i);
+                    break;
+                }
+           
+            beginNode = beginNode.next;
+        }
+        
+       return true;
+    }
+    
+    private void removeFromNode(ULLNode node, int id) {
+        node.size--;
+        for (int i = id; i < node.size; i++)
+            node.array[i] = node.array[i + 1];
+        
+        if (node.size < (sizeNode / 2 + 1) && node.next != null)
+            mergeNodes(node);
+    }
+    
+    private void mergeNodes(ULLNode node) {
+        int i = 0;
+        ULLNode next = node.next;
+        
+        for (i = 0; i < next.size; i++) {
+            node.array[node.size] = next.array[i];
+            node.size++;
+            
+            if (node.size == (sizeNode / 2 + 1)) break;
+        }
+        
+        ULLNode nptr;
+        int j;
+        
+        nptr = new ULLNode(sizeNode);
+        j = 0;
+
+        for (i++; i < next.size; i++) {
+            nptr.array[j++] = next.array[i];
+        }
+
+        nptr.size = j;
+
+        if (node.next.next != null)
+            nptr.next = node.next.next;
+
+        node.next = nptr;
+
+        if (node.next.size < (sizeNode / 2 + 1) && node.next.next != null) {
+            mergeNodes(node.next);
+        }
+    }
+
+    @Override
+    public void print(String text) {
+        
+        System.out.println("ULL (" + text + "):");
+        
+        if (nNode == 0) System.out.println("ULL is empty!");
+        else {
+            
+            ULLNode beginNode = start;
+            
+            while (beginNode != null) {
+                
+                for (int i = 0; i < beginNode.size; i++)
+                    System.out.println(beginNode.array[i] + " ");
+                
+                System.out.println("");
+                beginNode = beginNode.next;
+            }
+            
+        }     
+    }
+    
+}
